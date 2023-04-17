@@ -1,11 +1,8 @@
 # TODO -
-# MIA does not show that over epochs the attacks are more successful, despite overfitting
-# suspected that the batched datasets are resulting in this
-# TEST - recreate the privayc attacks from tensoreflow privacy, batch the input data, then send that to the privacy attack
-# TEST - Run in debug mode this script + the unmod tensorflow privacy tutorial, look at the values in the callback during privacy testing
-#    --> how many values are there compared to test / validation samples? What are range of values? ....
-#    --> explore multiple epochs of this test
-
+# The model here starts off at high accuracy, and reachs 95%+ quickly
+# suspected something going on with model itself.
+# test: run this script but with the CIFAR data to see how it behaves
+# Minor fixes this round: removed the imbalance in dataset xray/* there were originally 4:1 ratio for pneumonia vs not
 
 """
 Introduction to Membership Inference Attack - Privacy testing for ML Models
@@ -148,8 +145,8 @@ if __name__ == '__main__':
     img_width = 128
     epochs = 21
     epochs_per_report = 2  # how often should the privacy attacks be performed
-    learning_rate = 0.001
-    data_split = 0.25  # percent split that will go to validation dataset.
+    learning_rate = 0.0001
+    data_split = 0.3115  # percent split that will go to validation dataset.
     # NOTE: data_split must be configured so there are no partial batches
 
     # import data and split between training and validation datasets
@@ -161,7 +158,7 @@ if __name__ == '__main__':
         subset="training",
         seed=33,
         image_size=(img_height, img_width),
-        batch_size=batch_size
+        batch_size=batch_size,
     )
     val_ds = tf.keras.utils.image_dataset_from_directory(
         data_directory_training,
@@ -169,7 +166,8 @@ if __name__ == '__main__':
         subset="validation",
         seed=33,
         image_size=(img_height, img_width),
-        batch_size=batch_size)
+        batch_size=batch_size,
+    )
 
     # Mine metadata from the imported training and validation batchdatasets data types
     # image_dataset_from_directory utility will import a datatype _BatchDataSet which is not subscriptable
@@ -212,7 +210,7 @@ if __name__ == '__main__':
         layers.MaxPooling2D(),
         layers.Flatten(),
         layers.Dense(36, activation='relu'),
-        layers.Dense(num_classes)  # final layer must be the number of classes
+        layers.Dense(num_classes),  # final layer must be the number of classes
     ])
     # NOTE ON CONV2D Model: originally the results were misleading, required tuning hyperparameters
     # learnings: keeping images unscaled used more compute and the number of parameters was high (25M vs 1M parameters)
@@ -231,21 +229,19 @@ if __name__ == '__main__':
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
-        layers.Dense(num_classes)
+        layers.Dense(num_classes),
     ])
 
     # Compile Models
     model_repeated_conv2d.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        # loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        metrics=['accuracy']
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy'],
     )
     model_dense_layers.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-        # loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-        metrics=['accuracy']
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy'],
     )
 
     # report model stats

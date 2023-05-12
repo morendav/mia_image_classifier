@@ -18,52 +18,62 @@ The experiments are comparisons:
    * Demonstrates the affect of classificaiton output entropy has on memorization rates
 
 
-## TODO - FINISH README
 
-## mia.py
+## mia_intro_imageclassifier.py
 
 ### Outline
-Methods to repeatedly run private statistic generation. Arguments: number of iterations, data (list), privacy budget (epsilon)
-* repeated_sum
-* repeated_average
-* repeated_max
 
-Class to import data from csv, and clean the data
-Class methods to generate nonprivate statistic (mean, max, sum)
+**Import Block**
+* third party libraries
+* tensorflow, tensorflow datasets
+* tensorflow privacy libraries, module names imported as classes for ref later
+* suppress warnings for logarithmic convergence (when running MIA)
 
-Code in _main_
-* initalize class of clean data from csv
-* makes use of repeated_averaage and class method prepareData.nonprivate_average
-* generates plots for the study
+**Methods & classes**
+* Helper methods to create models, taking in as parameters model configuration
+  * conv_nn_builder
+  * dense_nn_builder
+* Building the dataset for model training
+  * dataset_builder - assumes default number of classes is 10
+  * unison_shuffle_arrays - is called from the dataset builder
+* PrivacyMetrics
+  * callback tf class, runs the mia every EPOCH (frequency of testing set as hyperparameter in main)
+
+
+**Main**
+
+1. define some hyperparameters for the MIA experiment
+2. create datasets
+    * call to dataset builder is split into two calls per number of classes: first is for training, second is for validation dataset
+    * set of calls repeated twice: once for 10 class and again for 4 class dataset
+    * more info on dataset class truncation can be found in the 'dataset_builder' method metadata
+3. Build models
+    * 3 experiments where 2 models are compared in each experiment, 1 model is reused across experiments, so total 5 models initialized here
+4. train models
+    * call back to MIA every EPOCH
+5. Print results
+    * plot training and validation accuracy & loss per epoch
+    * plot MIA results (two types of attacks, for two models per experiment) on same figure
+    * total 2 plots per experiment, 3 experiments = 6plots total
+    * save them locally (names, hardcoded)
+6. plot sampling of training data
 
 
 
 
 ### Ouput
 
-Running laplace.py as written generates a set of 4 figures:
+Running experiment creates 6 plots
 
-* annual_income_distribution_plots.png
-  * histograms and boxplots of the unmodified source data, demonstrating significant right-skew of the data
-  * note: a plot in this series is in log scale, so as to fully appreciate the skewness of the data
-* repeated_average_historgram.png
-  * observations of repeated private queries on the unmodified source data (e.g. private average)
-  * note: center of observations fall on true value
-* skew_corrected_repeated_average_historgram.png
-  * observations of repeated private queries on the skew-corrected source data
-* normalized_noise_observations.png
-  * Observations for skew-crrected and unmodified (skewed) data
-  * observations in this series are normalized with respect to each source data's true metric (e.g. true average)
-
+* plot training and validation accuracy & loss per epoch
+* plot MIA results (two types of attacks, for two models per experiment) on same figure
+    
 
 
 ### Input
 
-Data is provided in the /data/*.csv files located in the project root directory.
-This data was sourced from [Kaggle: Credit Score Classification](https://www.kaggle.com/datasets/parisrohan/credit-score-classification) challenge and carries an [Universal, Creative Commons Public License](https://creativecommons.org/publicdomain/zero/1.0/)
-
-This data is a fictional dataset that presents a unique user id keyed credit scoring source data. For the purpose of this demonstartion the annualized salary for the last month of the year (month = december) is used.
-
+Data is provided by public tensorflow datasets api
+Kudos to TFDS for supplying data for the ML community to use in tutorials and projects!
 
 ## Software License
 

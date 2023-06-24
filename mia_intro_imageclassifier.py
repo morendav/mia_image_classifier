@@ -320,9 +320,9 @@ if __name__ == '__main__':
     # Init Var
     reports_10class_modelType = []  # data structure to compare model types (Conv2d vs Dense) for the 10class dataset
     reports_10class_denseModelDepth = []  # data structure to compare model depth for Dense NN model for 10class dataset
-    reports_10and4class_conv2d = []  # data structure to compare model depth for Dense NN model for 4class dataset
+    reports_denseModel_10and4class = []  # data structure to compare model depth for Dense NN model for 4class dataset
     batch_size = 50  # usually one of 32, 64, 128, ... dataset sample count must be entirely divisible by batch size
-    epochs = 39  # total number of epochs the experiment will run for
+    epochs = 40  # total number of epochs the experiment will run for
     epochs_range = range(epochs)  # used for plotting figures later, assumes all models are trained for E epochs
     epochs_per_report = 2  # how often should the privacy attacks be performed
     learning_rate = 0.001  # hyperparameter for all models
@@ -406,27 +406,27 @@ if __name__ == '__main__':
     # Experiment: Compare experiment 1 dense model 10 class dataset, against the same model but for a 4class dataset
     # (Deprecated) Experiment: Compare Experiment 1 models trained on a 4 class dataset (4 first classes from 10class dataset)
     # these models cannot be reused from experiment 1 because we need 4 logtis here instead of 10 from experiment 1
-    dense_6layer_4label = dense_nn_builder(
-        input_shape=train_4_x.shape[1:],
-        num_classes=4,
-        neurons_per_layer=64,
-        depth=6,
-        activation='relu',
-    )
-    # dense_3layer_4label = dense_nn_builder(   # DEPRECATED EXPERIMENT - no longer using dense depth comparison for 4 class, no need to create this model
+    # dense_6layer_4label = dense_nn_builder(  # DEPRECATED EXPERIMENT - no longer using dense depth comparison for 4 class, no need to create this model
     #     input_shape=train_4_x.shape[1:],
     #     num_classes=4,
     #     neurons_per_layer=64,
-    #     depth=3,
+    #     depth=6,
     #     activation='relu',
     # )
+    dense_3layer_4label = dense_nn_builder(
+        input_shape=train_4_x.shape[1:],
+        num_classes=4,
+        neurons_per_layer=64,
+        depth=3,
+        activation='relu',
+    )
 
     print(f'\n\nReport model architectures')
     conv_3layer_10label.summary()
     dense_3layer_10label.summary()
     dense_6layer_10label.summary()
-    dense_6layer_4label.summary()
-    # dense_3layer_4label.summary()
+    # dense_6layer_4label.summary()
+    dense_3layer_4label.summary()
 
     # Train Models and run MIA while doing so via a callback
     print(f'\n\nTrain models and test at frequency: every {epochs_per_report} epoch ]\n')
@@ -435,7 +435,7 @@ if __name__ == '__main__':
     # train and append MIA report for 10class dense NN 3  layer
     callback = PrivacyMetrics(
         epochs_per_report=epochs_per_report,
-        model_name="denseNN_3layer",
+        model_name="10c_denseNN_3layer",
         train_input=train_10_x,
         train_labels_indices=train_10_y_indices,
         val_input=validation_10_x,
@@ -452,11 +452,11 @@ if __name__ == '__main__':
     )
     reports_10class_modelType.extend(callback.attack_results)  # add results to the model type 10class dataset results
     reports_10class_denseModelDepth.extend(callback.attack_results)  # add results to the model depth 10c dataset result
-    reports_10and4class_conv2d.extend(callback.attack_results)   # add results to static model, 10-4 class comparison
+    reports_denseModel_10and4class.extend(callback.attack_results)   # add results to static model, 10-4 class comparison
     # train and append MIA report for 10class conv2d 3  layer
     callback = PrivacyMetrics(
         epochs_per_report=epochs_per_report,  # signals how often the privacy attacks should be run on the model
-        model_name="conv2d_3layer",  # model codename internally
+        model_name="10c_conv2d_3layer",  # model codename internally
         train_input=train_10_x,
         train_labels_indices=train_10_y_indices,
         val_input=validation_10_x,
@@ -478,7 +478,7 @@ if __name__ == '__main__':
     # train and append MIA report for 10class dense 6layer depth model
     callback = PrivacyMetrics(
         epochs_per_report=epochs_per_report,
-        model_name="denseNN_6layer",
+        model_name="10c_denseNN_6layer",
         train_input=train_10_x,
         train_labels_indices=train_10_y_indices,
         val_input=validation_10_x,
@@ -502,34 +502,15 @@ if __name__ == '__main__':
     # later, I changed this to be a comparison holding model type and depth constant, to demonstrate how more classes
     # leads to higher MIA scores, because there is more information that the model exposes to an attacker
     # # train and append MIA report for 4class 3layer dense NN  (commented this block out)
-    # callback = PrivacyMetrics(
-    #     epochs_per_report=epochs_per_report,
-    #     model_name="4c_denseNN_3layer",
-    #     train_input=train_4_x,
-    #     train_labels_indices=train_4_y_indices,
-    #     val_input=validation_4_x,
-    #     val_labels_indices=validation_4_y_indices,
-    # )
-    # history_4class_depth_3layer = dense_3layer_4label.fit(
-    #     train_4_x,
-    #     train_4_y,
-    #     batch_size=batch_size,
-    #     validation_data=(validation_4_x, validation_4_y),
-    #     epochs=epochs,
-    #     callbacks=[callback],
-    # )
-    # reports_10and4class_conv2d.extend(callback.attack_results)
-    
-    # train and append MIA report for 4class conv2d 3  layer
     callback = PrivacyMetrics(
         epochs_per_report=epochs_per_report,
-        model_name="4c_denseNN_6layer",
+        model_name="4c_denseNN_3layer",
         train_input=train_4_x,
         train_labels_indices=train_4_y_indices,
         val_input=validation_4_x,
         val_labels_indices=validation_4_y_indices,
     )
-    history_4class_depth_6layer = dense_6layer_4label.fit(
+    history_4class_depth_3layer = dense_3layer_4label.fit(
         train_4_x,
         train_4_y,
         batch_size=batch_size,
@@ -537,7 +518,27 @@ if __name__ == '__main__':
         epochs=epochs,
         callbacks=[callback],
     )
-    reports_10and4class_conv2d.extend(callback.attack_results)
+    reports_denseModel_10and4class.extend(callback.attack_results)
+
+    # Deprecated experiment
+    # # train and append MIA report for 4class conv2d 3  layer
+    # callback = PrivacyMetrics(
+    #     epochs_per_report=epochs_per_report,
+    #     model_name="4c_denseNN_6layer",
+    #     train_input=train_4_x,
+    #     train_labels_indices=train_4_y_indices,
+    #     val_input=validation_4_x,
+    #     val_labels_indices=validation_4_y_indices,
+    # )
+    # history_4class_depth_6layer = dense_6layer_4label.fit(
+    #     train_4_x,
+    #     train_4_y,
+    #     batch_size=batch_size,
+    #     validation_data=(validation_4_x, validation_4_y),
+    #     epochs=epochs,
+    #     callbacks=[callback],
+    # )
+    # reports_denseModel_10and4class.extend(callback.attack_results)
 
     # Generate plots for experiment result visualization & demo sampling of the datasets
     # Report MIA results for model experiments
@@ -609,29 +610,29 @@ if __name__ == '__main__':
     # Sxs Reporting - 4class dataset, model type experiments
     # Model loss/accuracy vs epoch, model MIA results vs epoch. 4class dataset, dense3layer vs conv2d 3 layer
     # Plot MIA results
-    exp4class_results = AttackResultsCollection(reports_10and4class_conv2d)
+    exp4class_results = AttackResultsCollection(reports_denseModel_10and4class)
     epoch_plot = privacy_report.plot_by_epochs(
         exp4class_results,
         privacy_metrics=privacy_metrics
     )
-    epoch_plot.savefig(current_directory / 'exp4Class_mia_results.png')
+    epoch_plot.savefig(current_directory / 'exp10C_4C_mia_results.png')
     # Plot model training accuracy & loss vs training epoch
     plt.figure(figsize=(8, 8))
     plt.subplot(2, 1, 1)
-    plt.plot(epochs_range, history_4class_depth_6layer.history['accuracy'], color='blue', label='4class Train')
-    plt.plot(epochs_range, history_4class_depth_6layer.history['val_accuracy'], color='black', label='4class Val')
+    plt.plot(epochs_range, history_4class_depth_3layer.history['accuracy'], color='blue', label='4class Train')
+    plt.plot(epochs_range, history_4class_depth_3layer.history['val_accuracy'], color='black', label='4class Val')
     plt.plot(epochs_range, history_10class_modelType_dense.history['accuracy'], color='blue', linestyle='dashed', label='10class Train ')
     plt.plot(epochs_range, history_10class_modelType_dense.history['val_accuracy'], color='black', linestyle='dashed', label='10class Val')
     plt.legend(loc='lower right')
     plt.title('Class Comparison Accuracy')
     plt.subplot(2, 1, 2)
-    plt.plot(epochs_range, history_4class_depth_6layer.history['loss'], color='blue', label='4class Train')
-    plt.plot(epochs_range, history_4class_depth_6layer.history['val_loss'], color='black', label='4class Val')
+    plt.plot(epochs_range, history_4class_depth_3layer.history['loss'], color='blue', label='4class Train')
+    plt.plot(epochs_range, history_4class_depth_3layer.history['val_loss'], color='black', label='4class Val')
     plt.plot(epochs_range, history_10class_modelType_dense.history['loss'], color='blue', linestyle='dashed', label='10class Train')
     plt.plot(epochs_range, history_10class_modelType_dense.history['val_loss'], color='black', linestyle='dashed', label='10class Val')
     plt.legend(loc='upper right')
     plt.title('Class Comparison Loss')
-    plt.savefig(current_directory / 'exp10C_4Class_training_results.png')
+    plt.savefig(current_directory / 'exp10C_4C_training_results.png')
     plt.show()
 
     # plot sampling of the 10-class dataset

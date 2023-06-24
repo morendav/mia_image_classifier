@@ -1,0 +1,101 @@
+Report model architectures
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ conv2d (Conv2D)             (None, 30, 30, 32)        896
+
+ max_pooling2d (MaxPooling2D  (None, 15, 15, 32)       0
+ )
+
+ conv2d_1 (Conv2D)           (None, 13, 13, 32)        9248
+
+ max_pooling2d_1 (MaxPooling  (None, 6, 6, 32)         0
+ 2D)
+
+ conv2d_2 (Conv2D)           (None, 4, 4, 32)          9248
+
+ max_pooling2d_2 (MaxPooling  (None, 2, 2, 32)         0
+ 2D)
+
+ flatten (Flatten)           (None, 128)               0
+
+ dense (Dense)               (None, 64)                8256
+
+ dense_1 (Dense)             (None, 10)                650
+
+=================================================================
+Total params: 28,298
+Trainable params: 28,298
+Non-trainable params: 0
+_________________________________________________________________
+Model: "sequential_1"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ flatten_1 (Flatten)         (None, 3072)              0
+
+ dense_2 (Dense)             (None, 64)                196672
+
+ dense_3 (Dense)             (None, 64)                4160
+
+ dense_4 (Dense)             (None, 64)                4160
+
+ dense_5 (Dense)             (None, 64)                4160
+
+ dense_6 (Dense)             (None, 10)                650
+
+=================================================================
+Total params: 209,802
+Trainable params: 209,802
+Non-trainable params: 0
+_________________________________________________________________
+Model: "sequential_2"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ flatten_2 (Flatten)         (None, 3072)              0
+
+ dense_7 (Dense)             (None, 64)                196672
+
+ dense_8 (Dense)             (None, 64)                4160
+
+ dense_9 (Dense)             (None, 64)                4160
+
+ dense_10 (Dense)            (None, 64)                4160
+
+ dense_11 (Dense)            (None, 64)                4160
+
+ dense_12 (Dense)            (None, 64)                4160
+
+ dense_13 (Dense)            (None, 64)                4160
+
+ dense_14 (Dense)            (None, 10)                650
+
+=================================================================
+Total params: 222,282
+Trainable params: 222,282
+Non-trainable params: 0
+_________________________________________________________________
+Model: "sequential_3"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #
+=================================================================
+ flatten_3 (Flatten)         (None, 3072)              0
+
+ dense_15 (Dense)            (None, 64)                196672
+
+ dense_16 (Dense)            (None, 64)                4160
+
+ dense_17 (Dense)            (None, 64)                4160
+
+ dense_18 (Dense)            (None, 64)                4160
+
+ dense_19 (Dense)            (None, 4)                 260
+
+=================================================================
+Total params: 209,412
+Trainable params: 209,412
+Non-trainable params: 0
+_________________________________________________________________
+

@@ -13,7 +13,7 @@ The experiments are comparisons:
 2. Between two models of different depths
    * both models are densely connected NN of depth 7 and 4, thus having nearly 2x more parameters in the larger
    * Demonstrates the affect of having more parameters / deeper NN has on memorization rates
-3. Experiment 2 is repeated for a truncated dataset
+3. Between the same model for datasets that have different number of target classes
    * the same CIFAR10 is used, however only the first 4 classes of the 10 class dataset are used for these models
    * Demonstrates the affect of classificaiton output entropy has on memorization rates
 
